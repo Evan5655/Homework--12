@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <title>Simple p5.js Game</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  let player;
+  let obstacles = [];
+  let exit;
+
+  function setup() {
+    createCanvas(400, 400);
+    player = createPlayer(20, height / 2, 20, 20);
+    exit = createExit(width - 30, height / 2 - 15, 30, 30);
+    createObstacles();
+  }
+
+  function draw() {
+    background(220);
+
+    movePlayer();
+    drawPlayer();
+
+    moveObstacles();
+    drawObstacles();
+
+    drawExit();
+    checkCollision();
+    displayWinMessage();
+  }
+
+  function createPlayer(x, y, w, h) {
+    return {
+      x: x,
+      y: y,
+      width: w,
+      height: h,
+      color: 'blue',
+      speed: 5,
+    };
+  }
+
+  function drawPlayer() {
+    fill(player.color);
+    rect(player.x, player.y, player.width, player.height);
+  }
+
+  function movePlayer() {
+    if (keyIsDown(UP_ARROW) && player.y > 0) {
+      player.y -= player.speed;
+    } else if (keyIsDown(DOWN_ARROW) && player.y < height - player.height) {
+      player.y += player.speed;
+    } else if (keyIsDown(LEFT_ARROW) && player.x > 0) {
+      player.x -= player.speed;
+    } else if (keyIsDown(RIGHT_ARROW) && player.x < width - player.width) {
+      player.x += player.speed;
+    }
+  }
+
+  function createObstacle(x, y, w, h, speed) {
+    return {
+      x: x,
+      y: y,
+      width: w,
+      height: h,
+      color: color(random(255), random(255), random(255)),
+      speed: speed,
+    };
+  }
+
+  function createObstacles() {
+    obstacles.push(createObstacle(100, 50, 20, 20, random(1, 3)));
+    obstacles.push(createObstacle(300, 300, 30, 30, random(1, 3)));
+  }
+
+  function drawObstacles() {
+    for (let obstacle of obstacles) {
+      fill(obstacle.color);
+      rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    }
+  }
+
+  function moveObstacles() {
+    for (let obstacle of obstacles) {
+      obstacle.x += obstacle.speed;
+
+      if (obstacle.x > width) {
+        obstacle.x = 0 - obstacle.width;
+      }
+    }
+  }
+
+  function drawExit() {
+    fill('yellow');
+    rect(exit.x, exit.y, exit.width, exit.height);
+  }
+
+  function checkCollision() {
+    // Collision detection ignored for simplicity
+  }
+
+  function mousePressed() {
+    obstacles.push(createObstacle(mouseX, mouseY, 25, 25, 0));
+  }
+
+  function displayWinMessage() {
+    if (
+      player.x < exit.x + exit.width &&
+      player.x + player.width > exit.x &&
+      player.y < exit.y + exit.height &&
+      player.y + player.height > exit.y
+    ) {
+      textAlign(CENTER, CENTER);
+      textSize(32);
+      fill('green');
+      text('You Win!', width / 2, height / 2);
+    }
+  }
+</script>
+
+</body>
+</html>
